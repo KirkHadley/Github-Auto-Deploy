@@ -1,0 +1,10 @@
+{
+	"port": 8001, 
+	"repositories": 
+	[{
+		"url": "https://github.com/jropinion/content", 
+		"path": "/home/kirk/juannell/c_fork/content",
+        "deploy": "cd /home/kirk/juannell/blog && pelican ../c_fork/content/blog_content" 
+	} 
+	]
+}
