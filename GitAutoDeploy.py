@@ -47,7 +47,7 @@ class GitAutoDeploy(BaseHTTPRequestHandler):
         for url in urls:
             paths = self.getMatchingPaths(url)
             for path in paths:
-                self.fetch(path)
+                self.pull(path)
                 self.deploy(path)
 
     def parseRequest(self):
@@ -70,30 +70,21 @@ class GitAutoDeploy(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/plain')
         self.end_headers()
 
-    def fetch(self, path):
+    def pull(self, path):
         if(not self.quiet):
             print "\nPost push request received"
             print 'Updating ' + path
-        call(['cd "' + path + '" && git fetch'], shell=True)
+        call(['cd "' + path + '" && git pull --no-edit'], shell=True)
 
     def deploy(self, path):
         config = self.getConfig()
         for repository in config['repositories']:
             if(repository['path'] == path):
                 if 'deploy' in repository:
-                    branch = None
-                    if 'branch' in repository:
-                        branch = repository['branch']
-
-                    if branch is None or branch == self.branch:
-                        if(not self.quiet):
-                            print 'Executing deploy command'
-                        call(['cd "' + path + '" && ' + repository['deploy']], shell=True)
-                        
-                    elif not self.quiet:
-                        print 'Push to different branch (%s != %s), not deploying' % (branch, self.branch)
-                break
-
+                    print 'Executing deploy command'
+                    call(['cd "' + path + '" && ' + repository['deploy']], shell=True)        
+            else:
+                print repository, "not on in config file"
 def main():
     try:
         server = None
